@@ -1,30 +1,31 @@
-name: Build Docker Image             # The name that appears in the Actions tab
+name: Build Docker Image
 
-on:                                  # When this workflow will run
-  push:                              # Trigger: when code is pushed
-    branches: [ main ]               # Only on the main branch
+on:
+  push:
+    branches: [ main ]
 
-jobs:                                # The tasks to perform
-  build:                             # A job named "build"
-    runs-on: ubuntu-latest           # The virtual machine to use
+jobs:
+  build:
+    runs-on: ubuntu-latest
     
-    steps:                           # The sequential steps to run
-    - name: Checkout code            # Step 1: Download the repository code
-      uses: actions/checkout@v3      # Updated to v3
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
     
-    - name: Set up Docker Buildx     # Step 2: Set up the Docker build system
-      uses: docker/setup-buildx-action@v2  # Updated to v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
     
-    - name: Build Docker image       # Step 3: Build the Docker image
-      uses: docker/build-push-action@v4    # Updated to v4
-      with:                          # Parameters for this action
-        context: .                   # Build context (current directory)
-        push: false                  # Don't push to a registry
-        tags: myapp:latest           # Tag for the image
-        outputs: type=docker,dest=/tmp/myapp.tar  # Save image as a file
-    
-    - name: Upload Docker image      # Step 4: Save the image as an artifact
-      uses: actions/upload-artifact@v3     # Updated to v3
+    - name: Build Docker image
+      uses: docker/build-push-action@v4
       with:
-        name: docker-image           # Name of the artifact
-        path: /tmp/myapp.tar         # File to upload
+        context: .
+        load: true  
+        tags: myapp:latest
+    
+    - name: Verify Docker image
+      run: |
+        # List Docker images to verify it was built
+        docker images
+        
+        # You can run a container from the image if needed
+        docker run --rm myapp:latest echo "Image works!"
